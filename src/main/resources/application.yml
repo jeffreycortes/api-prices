@@ -15,3 +15,113 @@ spring:
       console:
         enabled: true
         path: /h2-console
+azure:
+  application-insights: #appi-ti-dev
+    instrumentation-key: c8eb404e-8052-4e45-afa8-b2438f6d19eb
+apigee:
+  url: https://colsubsidio-test.apigee.net
+  path:
+    auth: /oauth/client_credential/accesstoken
+    logger: /api/v1/tecnologia/logger
+  token:
+    url: /oauth/client_credential/accesstoken
+    clienteId: cmnGMnGPVKLJwWLfWxqFCSZOR5hIjhWb
+    clienteSecreto: uKCYJXAVkLY5gsWt
+    maxTimeInMillis: 300000 #300000 millis = 5 minutes
+  services:
+    consultar-usuarios-empresas: /api/v1/colclientes/usuarios/empresas/personas
+    consultar-empresa: /api/v1/colclientes/usuarios/empresas
+    crear-empresa: /api/v1/colclientes/usuarios/empresas
+    crear-usuario-empresa: /api/v1/colclientes/usuarios/personas/empresas
+colsubsidio:
+  elasticSearch:
+    index: api-prices
+    type: api-azure
+logging:
+  level:
+    api: TRACE
+  console: true
+swagger:
+  url: http://localhost:8080/v1.0/swagger-ui/index.html#/
+security:
+  secret-aes: $C@lcl13n!es#$CR
+  api-key: 3c4504c4-72b2-11ee-b962-0242ac120002
+mail:
+  url: http://40.117.63.112/utilidades/email/api/v1/email
+  method: POST
+  copy:
+  headers: "{'Authorization': 'YXNlc3Zpcmw='}"
+  replyHidden: diannys.granadillo@gtcloud.com.co
+  url-colsubsidio:
+    colsubsidio-empresas:  www.colsubsidio.com/empresas
+    ayuda-afiliacion-grupo-familiar:  https://ayuda.colsubsidio.com/como-afilio-grupo-familiar
+    ayuda-subsidio-familiar: https://ayuda.colsubsidio.com/como-solicito-mi-subsidio-familiar
+    ayuda-afiliacion-colaboradores: https://ayuda.colsubsidio.com/como-afilio-a-mis-colaboradores
+  mail-colsubsidio:
+    correo-afiliaciones: operadorafiliaciones1@colsubsidio.com
+    correo_novedades-afiliacion: novedadesafiliaciones.linea@colsubsidio.com
+notification:
+  email:
+    url: https://app-tra-email-sender-api-develop.azurewebsites.net
+    path: /v1.0/mail
+---
+server:
+  port: ${PORT}
+  servlet:
+    context-path: /v1.0
+spring:
+  application:
+    name: api-prices
+    version: ${VERSION}
+  config:
+    activate:
+      on-profile: release
+azure:
+  application-insights: #appi-ti-dev
+    instrumentation-key: ${INSIGHTS_KEY}
+apigee:
+  url: ${APIGEE_URL}
+  path:
+    auth: /oauth/client_credential/accesstoken
+    logger: /api/v1/tecnologia/logger
+  token:
+    url: /oauth/client_credential/accesstoken
+    clienteId: ${APIGEE_CLIENT_ID}
+    clienteSecreto: ${APIGEE_CLIENT_SECRET}
+    maxTimeInMillis: 300000 #300000 millis = 5 minutes
+  services:
+    consultar-usuarios-empresas: ${APIGEE_SERVICES_CONSULTAR_USUARIO_EMPRESA}
+    consultar-empresa: ${APIGEE_SERVICES_CONSULTAR_EMPRESA}
+    crear-empresa: ${APIGEE_SERVICES_CREAR_EMPRESA}
+    crear-usuario-empresa: ${APIGEE_SERVICES_CREAR_USUARIO_EMPRESA}
+colsubsidio:
+  elasticSearch:
+    index: api-prices
+    type: api-azure
+logging:
+  level:
+    api: TRACE
+  console: true
+swagger:
+  url: http://localhost:8080/v1.0/swagger-ui/index.html#/
+security:
+  secret-aes: ${SECURITY_SECRET_AES}
+  api-key: ${API_KEY}
+mail:
+  url: ${EMAIL_SERVICE_URL}
+  method: POST
+  copy: ${EMAIL_SERVICE_LISTADO_CC}
+  headers: ${EMAIL_SERVICE_HEADERS}
+  replyHidden: ${EMAIL_SERVICE_LISTADO_CO}
+  url-colsubsidio:
+    colsubsidio-empresas: ${EMAIL_BODY_URL_COLSUBSIDIO_EMPRESA}
+    ayuda-afiliacion-grupo-familiar: ${EMAIL_BODY_URL_AYUDA_AFILIACION_GRUPO_FAMILIAR}
+    ayuda-subsidio-familiar: ${EMAIL_BODY_URL_AYUDA_SUBSIDIO_FAMILIAR}
+    ayuda-afiliacion-colaboradores: ${EMAIL_BODY_URL_AYUDA_AFILIACION_COLABORADORES}
+  mail-colsubsidio:
+    correo-afiliaciones: ${EMAIL_BODY_CORREO_AFILIACIONES}
+    correo_novedades-afiliacion: ${EMAIL_BODY_CORREO_NOVEDADES_AFILIACION}
+notification:
+  email:
+    url: ${EMAIL_SERVICE_TRV_URL}
+    path: ${EMAIL_SERVICE_TRV_PATH}

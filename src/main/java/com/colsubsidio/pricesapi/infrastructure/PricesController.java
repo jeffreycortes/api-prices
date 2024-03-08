@@ -1,10 +1,10 @@
 package com.colsubsidio.pricesapi.infrastructure;
 
-import com.colsubsidio.pricesapi.common.telemetry.LogsManager;
-import org.springframework.web.bind.annotation.GetMapping;
 import com.colsubsidio.pricesapi.common.EnvironmentService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.colsubsidio.pricesapi.common.telemetry.LogsManager;
+import com.colsubsidio.pricesapi.domain.PriceResponseDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("prices/")
@@ -19,5 +19,20 @@ public class PricesController  {
     public String version() {
         logsManager.info("Version: ", environmentService.getVersion());
         return environmentService.getVersion();
+    }
+
+    @GetMapping(value = "/{cadenaId}/{productoId}", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public PriceResponseDto getPriceFinal(
+            @PathVariable("cadenaId") String cadenaId,
+            @PathVariable("productoId") String productoId,
+            @RequestParam String dateApply) {
+        logsManager.info("Fecha aplicacion", dateApply);
+        return PriceResponseDto.builder()
+                .cadenaId(cadenaId)
+                .productoId(productoId)
+                .tarifa("35.50")
+                .fechasAplicacion(dateApply)
+                .build();
     }
 }
