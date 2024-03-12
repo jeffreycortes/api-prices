@@ -28,7 +28,7 @@ public class DateUtils {
 
 	public static Date formatDate(String dateTxt, String format) {
 		try {
-			return new SimpleDateFormat(format, Locale.ENGLISH).parse(dateTxt);
+			return new SimpleDateFormat(format).parse(dateTxt);
 		} catch (Exception e) {
 			var error = new StringBuilder();
 			error.append(DateUtils.class.getName());
