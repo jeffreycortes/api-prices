@@ -55,6 +55,11 @@ public class DateUtils {
 		}
 	}
 
+	public static String toISO(Date date) {
+		String ISOFormat = "yyyy-MM-dd'T'HH:mm:ss";
+		return new SimpleDateFormat(ISOFormat).format(date);
+	}
+
 	/* "yyyy-MM-dd":"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" */
 	public static String formatDate(String format, String dateTxt, String formatReturn) {
 		try {
