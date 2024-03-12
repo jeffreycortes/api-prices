@@ -1,12 +1,13 @@
 package com.colsubsidio.pricesapi.infrastructure;
 
 import com.colsubsidio.pricesapi.application.PriceManagerService;
+import com.colsubsidio.pricesapi.common.DateUtils;
 import com.colsubsidio.pricesapi.common.EnvironmentService;
 import com.colsubsidio.pricesapi.common.telemetry.LogsManager;
 import com.colsubsidio.pricesapi.domain.PriceRequestDto;
 import com.colsubsidio.pricesapi.domain.PriceResponseDto;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -50,17 +51,20 @@ public class PricesController  {
     @GetMapping(value = "/{cadenaId}/{productoId}/query", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public PriceResponseDto getPriceEntity(
-            @PathVariable("cadenaId") String cadenaId,
-            @PathVariable("productoId") String productoId,
+            @PathVariable("cadenaId") long cadenaId,
+            @PathVariable("productoId") long productoId,
             @RequestParam String dateApply) {
-        logsManager.info("Fecha aplicacion", dateApply);
+        logsManager.info("Fecha aplicacion", dateApply.toString());
 
+        Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
         var filter =  PriceRequestDto.builder()
                 .cadenaId(cadenaId)
                 .productoId(productoId)
-                .fechaAplicacion(dateApply)
+                .fechaAplicacion(fechaAplicacion)
                 .build();
 
-        return this.priceManagerService.getFinalPrice(filter);
+        return this.priceManagerService.findPriceFinal(filter);
     }
+
+
 }
