@@ -43,7 +43,7 @@ public class PricesController  {
                 .cadenaId(cadenaId)
                 .productoId(productoId)
                 .tarifa(1)
-                .fechasAplicacion(dateApply)
+                .fechasAplicacion(DateUtils.toISO(dateApply))
                 .precioFinal(BigDecimal.valueOf(35.500))
                 .moneda("COP")
                 .build();
@@ -65,6 +65,4 @@ public class PricesController  {
 
         return this.priceManagerService.findPriceFinal(filter);
     }
-
-
 }
