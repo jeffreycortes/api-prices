@@ -4,10 +4,12 @@ import com.colsubsidio.pricesapi.common.EnvironmentService;
 import com.colsubsidio.pricesapi.common.telemetry.LogsManager;
 import com.colsubsidio.pricesapi.domain.PriceResponseDto;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("prices/")
+@CrossOrigin(origins = "*")
 public class PricesController  {
     EnvironmentService environmentService;
     private final LogsManager logsManager;
