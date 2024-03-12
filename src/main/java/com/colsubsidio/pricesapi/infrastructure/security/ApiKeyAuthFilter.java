@@ -45,12 +45,14 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        this.log.info("ApiKeyFilter - URL -- ",request.getMethod() + " -- " +request.getRequestURI());
+        this.log.info("ApiKeyFilter - URL -- ",request.getMethod() + " -- " + request.getRequestURI());
         this.log.info("ApiKeyAuthFilter activo");
         String requestApiKey = request.getHeader("ApiKey");
 
         boolean sonCredencialesValidas = this.environmentService.getApiKey().equals(requestApiKey);
-        if (sonCredencialesValidas) {
+        boolean esH2Console = request.getRequestURI().contains("/h2-console");
+
+        if (sonCredencialesValidas || esH2Console) {
             this.log.info("sonCredencialesValidas", "Se crea autenticación");
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("trigger", (Object)null, (Collection)null);
             SecurityContextHolder.getContext().setAuthentication(auth);
