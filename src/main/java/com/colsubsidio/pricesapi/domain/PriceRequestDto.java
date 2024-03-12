@@ -3,10 +3,12 @@ package com.colsubsidio.pricesapi.domain;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @Builder
 public class PriceRequestDto {
-    String fechaAplicacion;
-    String productoId;
-    String cadenaId;
+    Date fechaAplicacion;
+    long productoId;
+    long cadenaId;
 }
