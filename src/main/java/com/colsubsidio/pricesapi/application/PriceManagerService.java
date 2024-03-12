@@ -1,5 +1,6 @@
 package com.colsubsidio.pricesapi.application;
 
+import com.colsubsidio.pricesapi.common.DateUtils;
 import com.colsubsidio.pricesapi.domain.PriceEntity;
 import com.colsubsidio.pricesapi.domain.PriceRequestDto;
 import com.colsubsidio.pricesapi.domain.PriceResponseDto;
@@ -33,7 +34,7 @@ public class PriceManagerService {
                 .cadenaId(price.getBrandId())
                 .productoId(price.getProductId())
                 .tarifa(price.getPriceList())
-                .fechasAplicacion(price.getStartDate())
+                .fechasAplicacion(DateUtils.toISO(price.getStartDate()))
                 .precioFinal(price.getPrice())
                 .moneda(price.getCurr())
                 .build();
@@ -46,7 +47,7 @@ public class PriceManagerService {
                 .cadenaId(price.getBrandId())
                 .productoId(price.getProductId())
                 .tarifa(price.getPriceList())
-                .fechasAplicacion(price.getStartDate())
+                .fechasAplicacion(DateUtils.toISO(price.getStartDate()))
                 .precioFinal(price.getPrice())
                 .moneda(price.getCurr())
                 .build();
@@ -68,7 +69,7 @@ public class PriceManagerService {
                 .cadenaId(price.getBrandId())
                 .productoId(price.getProductId())
                 .tarifa(price.getPriceList())
-                .fechasAplicacion(price.getStartDate())
+                .fechasAplicacion(DateUtils.toISO(price.getStartDate()))
                 .precioFinal(price.getPrice())
                 .moneda(price.getCurr())
                 .build();
