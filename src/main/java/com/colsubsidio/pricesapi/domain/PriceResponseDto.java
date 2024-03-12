@@ -12,7 +12,7 @@ public class PriceResponseDto {
     long productoId;
     long cadenaId;
     int tarifa;
-    Date fechasAplicacion;
+    String fechasAplicacion;
     BigDecimal precioFinal;
     String moneda;
 }
