@@ -3,12 +3,16 @@ package com.colsubsidio.pricesapi.domain;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 @Data
 @Builder
 public class PriceResponseDto {
-    String productoId;
-    String cadenaId;
-    String tarifa;
-    String fechasAplicacion;
-    String precioFinal;
+    long productoId;
+    long cadenaId;
+    int tarifa;
+    Date fechasAplicacion;
+    BigDecimal precioFinal;
+    String moneda;
 }
