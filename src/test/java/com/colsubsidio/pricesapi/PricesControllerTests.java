@@ -111,7 +111,7 @@ public class PricesControllerTests {
         String dateApply = "2022-06-14 21:00:00";
 
         Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
-        Date fechaInicio = DateUtils.formatDate("2020-06-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date fechaInicio = DateUtils.formatDate("2020-06-14 15:00:00", "yyyy-MM-dd HH:mm:ss");
         Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
 
         PriceEntity priceEntity = new PriceEntity();
@@ -211,13 +211,10 @@ public class PricesControllerTests {
     @Test
     public void testGetPriceFinal4() throws Exception {
         String dateApply = "2022-06-15 10:00:00";
-        String ApiKey = "3c4504c4-72b2-11ee-b962-0242ac120002";
         Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
         Date fechaInicio = DateUtils.formatDate("2020-06-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
         var lista = new ArrayList<PriceEntity>();
-        // Crear un ObjectMapper
-        ObjectMapper objectMapper = new ObjectMapper();
 
         PriceEntity priceEntity = new PriceEntity();
         priceEntity.setBrandId(cadenaId);
