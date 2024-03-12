@@ -7,7 +7,7 @@ spring:
     name: api-prices
     version: develop
   datasource:
-    url: jdbc:h2:mem:prices
+    url: jdbc:h2:mem:prices_db
     driverClassName: org.h2.Driver
     username: sa
     password:
@@ -16,8 +16,12 @@ spring:
     show-sql: true
     properties:
      hibernate.format_sql: true
+    defer-datasource-initialization: true
   h2:
     console.enabled: true
+  batch:
+    jdbc:
+      initialize-schema: always
 azure:
   application-insights: #appi-ti-dev
     instrumentation-key: c8eb404e-8052-4e45-afa8-b2438f6d19eb
