@@ -1,3 +1,7 @@
+spring:
+  profiles:
+    active: develop
+---
 server:
   port: 8080
   servlet:
@@ -6,6 +10,9 @@ spring:
   application:
     name: api-prices
     version: develop
+  config:
+    activate:
+      on-profile: develop
   datasource:
     url: jdbc:h2:mem:prices_db
     driverClassName: org.h2.Driver
