@@ -51,7 +51,7 @@ public class PricesControllerTests {
     @MockBean
     private PriceManagerService priceManagerService;
 
-    @Autowired
+    @MockBean
     private PricesRepository pricesRepository;
 
 
@@ -69,7 +69,7 @@ public class PricesControllerTests {
 
         String expectedJsonResponse = objectMapper.writeValueAsString(resultado);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/prices/{cadenaId}/{productoId}/query", cadenaId, productoId)
+        mockMvc.perform(MockMvcRequestBuilders.get("/prices/{cadenaId}/{productoId}", cadenaId, productoId)
                         .header("ApiKey", ApiKey)
                         .param("dateApply", dateApply)
                         .contentType(MediaType.APPLICATION_JSON))
