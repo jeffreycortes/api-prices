@@ -22,4 +22,15 @@ public class PriceEntity {
     short priority; //Desambiguador de aplicación de precios. Si dos tarifas coinciden en un rago de fechas se aplica la de mayor prioridad (mayor valor numérico).
     BigDecimal price; //precio final de venta.
     String curr; // iso de la moneda.
+
+    public static PriceEntity getInstance(long cadenaId, long productoId, short priority, Date startDate, Date endDate) {
+        var priceEntity = new PriceEntity();
+        priceEntity.setBrandId(cadenaId);
+        priceEntity.setProductId(productoId);
+        priceEntity.setPriority(priority);
+        priceEntity.setStartDate(startDate);
+        priceEntity.setEndDate(endDate);
+
+        return priceEntity;
+    }
 }

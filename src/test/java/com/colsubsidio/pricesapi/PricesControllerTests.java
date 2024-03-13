@@ -3,10 +3,7 @@ package com.colsubsidio.pricesapi;
 import com.colsubsidio.pricesapi.application.PriceManagerService;
 import com.colsubsidio.pricesapi.common.DateUtils;
 import com.colsubsidio.pricesapi.common.telemetry.LogsManager;
-import com.colsubsidio.pricesapi.domain.PriceEntity;
-import com.colsubsidio.pricesapi.domain.PriceRequestDto;
-import com.colsubsidio.pricesapi.domain.PriceResponseDto;
-import com.colsubsidio.pricesapi.domain.PricesRepository;
+import com.colsubsidio.pricesapi.domain.*;
 import com.colsubsidio.pricesapi.infrastructure.PricesController;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 
@@ -52,51 +51,23 @@ public class PricesControllerTests {
     @MockBean
     private PriceManagerService priceManagerService;
 
-    @MockBean
+    @Autowired
     private PricesRepository pricesRepository;
 
-    @Test
-    public void testGetPriceFinal() throws Exception {
-        String dateApply = "2022-06-14 10:00:00";
 
-        Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
-        Date fechaInicio = DateUtils.formatDate("2020-06-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
-        Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
-
-        PriceEntity priceEntity = new PriceEntity();
-        priceEntity.setBrandId(cadenaId);
-        priceEntity.setProductId(productoId);
-        priceEntity.setPriority((short) 1);
-        priceEntity.setStartDate(fechaInicio);
-        priceEntity.setEndDate(fechaFin);
-
-        var lista = new ArrayList<PriceEntity>();
-        lista.add(priceEntity);
-
-        PriceRequestDto expectedRequest = PriceRequestDto.builder()
-                .cadenaId(cadenaId)
-                .productoId(productoId)
-                .fechaAplicacion(fechaAplicacion)
-                .build();
-
-        PriceResponseDto expectedResponse = PriceResponseDto.builder()
-                .cadenaId(cadenaId)
-                .productoId(productoId)
-                .tarifa(2)
-                .fechasAplicacion(DateUtils.toISO(fechaAplicacion))
-                .precioFinal(BigDecimal.valueOf(25.45))
-                .build();
+    private void execute(String dateApply, Date fechaAplicacion, List<PriceEntity> lista, Resultado resultado) throws Exception {
+        var expectedRequest = PriceRequestDto.instance(cadenaId, productoId, fechaAplicacion);
 
         when(environmentService.getApiKey()).thenReturn(ApiKey);
 
         when(
                 pricesRepository
-                        .findByBrandIdAndProductIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(cadenaId, productoId, fechaAplicacion, fechaAplicacion))
-                .thenReturn(lista);
+                .findByBrandIdAndProductIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(cadenaId, productoId, fechaAplicacion, fechaAplicacion))
+            .thenReturn(lista);
 
-        when(priceManagerService.findPriceFinal(expectedRequest)).thenReturn(expectedResponse);
+        when(priceManagerService.getPriceFinal(expectedRequest)).thenReturn(resultado);
 
-        String expectedJsonResponse = objectMapper.writeValueAsString(expectedResponse);
+        String expectedJsonResponse = objectMapper.writeValueAsString(resultado);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/prices/{cadenaId}/{productoId}/query", cadenaId, productoId)
                         .header("ApiKey", ApiKey)
@@ -104,209 +75,149 @@ public class PricesControllerTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(expectedJsonResponse));
+    }
+
+    @Test
+    public void testGetPriceFinal() throws Exception {
+        int tarifa = 2;
+        short priority = 1;
+        var dateApply = "2022-06-14 10:00:00";
+        var lista = new ArrayList<PriceEntity>();
+        var precioFinal = BigDecimal.valueOf(25.45);
+        Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
+        String fechaAplicacionEnIso = DateUtils.toISO(fechaAplicacion);
+        Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date fechaInicio = DateUtils.formatDate("2020-06-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
+
+        var priceEntity = PriceEntity.getInstance(cadenaId, productoId, priority, fechaInicio, fechaFin);
+
+        lista.add(priceEntity);
+
+        PriceResponseDto expectedResponse = PriceResponseDto.builder()
+                .cadenaId(cadenaId)
+                .productoId(productoId)
+                .tarifa(tarifa)
+                .fechasAplicacion(fechaAplicacionEnIso)
+                .precioFinal(precioFinal)
+                .build();
+
+        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
+
+        execute(dateApply, fechaAplicacion, lista, resultado);
     }
 
     @Test
     public void testGetPriceFInal2() throws Exception {
-        String dateApply = "2022-06-14 21:00:00";
-
+        int tarifa = 2;
+        short priority = 1;
+        var dateApply = "2022-06-14 21:00:00";
+        var lista = new ArrayList<PriceEntity>();
+        var precioFinal = BigDecimal.valueOf(25.45);
         Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
+        String fechaAplicacionEnIso = DateUtils.toISO(fechaAplicacion);
         Date fechaInicio = DateUtils.formatDate("2020-06-14 15:00:00", "yyyy-MM-dd HH:mm:ss");
         Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
 
-        PriceEntity priceEntity = new PriceEntity();
-        priceEntity.setBrandId(cadenaId);
-        priceEntity.setProductId(productoId);
-        priceEntity.setPriority((short) 1);
-        priceEntity.setStartDate(fechaInicio);
-        priceEntity.setEndDate(fechaFin);
+        var priceEntity = PriceEntity.getInstance(cadenaId, productoId, priority, fechaInicio, fechaFin);
 
-        var lista = new ArrayList<PriceEntity>();
         lista.add(priceEntity);
-
-        PriceRequestDto expectedRequest = PriceRequestDto.builder()
-                .cadenaId(cadenaId)
-                .productoId(productoId)
-                .fechaAplicacion(fechaAplicacion)
-                .build();
 
         PriceResponseDto expectedResponse = PriceResponseDto.builder()
                 .cadenaId(cadenaId)
                 .productoId(productoId)
-                .tarifa(2)
-                .fechasAplicacion(DateUtils.toISO(fechaAplicacion))
-                .precioFinal(BigDecimal.valueOf(25.45))
+                .tarifa(tarifa)
+                .fechasAplicacion(fechaAplicacionEnIso)
+                .precioFinal(precioFinal)
                 .build();
 
-        when(environmentService.getApiKey()).thenReturn(ApiKey);
+        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
 
-        when(
-                pricesRepository
-                        .findByBrandIdAndProductIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(cadenaId, productoId, fechaAplicacion, fechaAplicacion))
-                .thenReturn(lista);
-
-        when(priceManagerService.findPriceFinal(expectedRequest)).thenReturn(expectedResponse);
-
-        String expectedJsonResponse = objectMapper.writeValueAsString(expectedResponse);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/prices/{cadenaId}/{productoId}/query", cadenaId, productoId)
-                        .header("ApiKey", ApiKey)
-                        .param("dateApply", dateApply)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(expectedJsonResponse));
+        execute(dateApply, fechaAplicacion, lista, resultado);
     }
 
     @Test
     public void testGetPriceFInal3() throws Exception {
-        String dateApply = "2022-06-14 21:00:00";
-
+        int tarifa = 1;
+        short priority = 1;
+        var dateApply = "2022-06-14 21:00:00";
+        var lista = new ArrayList<PriceEntity>();
+        var precioFinal = BigDecimal.valueOf(35.50);
         Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
+        String fechaAplicacionEnIso = DateUtils.toISO(fechaAplicacion);
         Date fechaInicio = DateUtils.formatDate("2020-06-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
 
-        PriceEntity priceEntity = new PriceEntity();
-        priceEntity.setBrandId(cadenaId);
-        priceEntity.setProductId(productoId);
-        priceEntity.setPriority((short) 1);
-        priceEntity.setStartDate(fechaInicio);
-        priceEntity.setEndDate(fechaFin);
+        var priceEntity = PriceEntity.getInstance(cadenaId, productoId, priority, fechaInicio, fechaFin);
 
-        var lista = new ArrayList<PriceEntity>();
         lista.add(priceEntity);
-
-        PriceRequestDto expectedRequest = PriceRequestDto.builder()
-                .cadenaId(cadenaId)
-                .productoId(productoId)
-                .fechaAplicacion(fechaAplicacion)
-                .build();
 
         PriceResponseDto expectedResponse = PriceResponseDto.builder()
                 .cadenaId(cadenaId)
                 .productoId(productoId)
-                .tarifa(1)
-                .fechasAplicacion(DateUtils.toISO(fechaAplicacion))
-                .precioFinal(BigDecimal.valueOf(35.50))
+                .tarifa(tarifa)
+                .fechasAplicacion(fechaAplicacionEnIso)
+                .precioFinal(precioFinal)
                 .build();
 
-        when(environmentService.getApiKey()).thenReturn(ApiKey);
+        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
 
-        when(
-                pricesRepository
-                        .findByBrandIdAndProductIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(cadenaId, productoId, fechaAplicacion, fechaAplicacion))
-                .thenReturn(lista);
-
-        when(priceManagerService.findPriceFinal(expectedRequest)).thenReturn(expectedResponse);
-
-        String expectedJsonResponse = objectMapper.writeValueAsString(expectedResponse);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/prices/{cadenaId}/{productoId}/query", cadenaId, productoId)
-                        .header("ApiKey", ApiKey)
-                        .param("dateApply", dateApply)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(expectedJsonResponse));
+        execute(dateApply, fechaAplicacion, lista, resultado);
     }
 
     @Test
     public void testGetPriceFinal4() throws Exception {
-        String dateApply = "2022-06-15 10:00:00";
+        int tarifa = 1;
+        short priority = 1;
+        var dateApply = "2022-06-15 10:00:00";
+        var lista = new ArrayList<PriceEntity>();
+        var precioFinal = BigDecimal.valueOf(30.50);
         Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
+        String fechaAplicacionEnIso = DateUtils.toISO(fechaAplicacion);
         Date fechaInicio = DateUtils.formatDate("2020-06-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
-        var lista = new ArrayList<PriceEntity>();
 
-        PriceEntity priceEntity = new PriceEntity();
-        priceEntity.setBrandId(cadenaId);
-        priceEntity.setProductId(productoId);
-        priceEntity.setPriority((short) 1);
-        priceEntity.setStartDate(fechaInicio);
-        priceEntity.setEndDate(fechaFin);
+        var priceEntity = PriceEntity.getInstance(cadenaId, productoId, priority, fechaInicio, fechaFin);
 
         lista.add(priceEntity);
-
-
-        PriceRequestDto expectedRequest = PriceRequestDto.builder()
-                .cadenaId(cadenaId)
-                .productoId(productoId)
-                .fechaAplicacion(fechaAplicacion)
-                .build();
-
 
         PriceResponseDto expectedResponse = PriceResponseDto.builder()
                 .cadenaId(cadenaId)
                 .productoId(productoId)
-                .tarifa(1)
-                .fechasAplicacion(DateUtils.toISO(fechaAplicacion))
-                .precioFinal(BigDecimal.valueOf(30.50))
+                .tarifa(tarifa)
+                .fechasAplicacion(fechaAplicacionEnIso)
+                .precioFinal(precioFinal)
                 .build();
 
-        when(environmentService.getApiKey()).thenReturn(ApiKey);
+        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
 
-        when(
-                pricesRepository
-                    .findByBrandIdAndProductIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(cadenaId, productoId, fechaAplicacion, fechaAplicacion))
-                    .thenReturn(lista);
-
-        when(priceManagerService.findPriceFinal(expectedRequest)).thenReturn(expectedResponse);
-
-        String expectedJsonResponse = objectMapper.writeValueAsString(expectedResponse);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/prices/{cadenaId}/{productoId}/query", cadenaId, productoId)
-                        .header("ApiKey", ApiKey)
-                        .param("dateApply", dateApply)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(expectedJsonResponse));
+        execute(dateApply, fechaAplicacion, lista, resultado);
     }
     @Test
     public void testGetPriceFinal5() throws Exception {
-        String dateApply = "2022-06-16 21:00:00";
-
+        int tarifa = 4;
+        short priority = 1;
+        var dateApply = "2022-06-16 21:00:00";
+        var lista = new ArrayList<PriceEntity>();
+        var precioFinal = BigDecimal.valueOf(38.95);
         Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
+        String fechaAplicacionEnIso = DateUtils.toISO(fechaAplicacion);
         Date fechaInicio = DateUtils.formatDate("2020-06-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date fechaFin = DateUtils.formatDate("2020-06-15 11:00:00", "yyyy-MM-dd HH:mm:ss");
 
-        PriceEntity priceEntity = new PriceEntity();
-        priceEntity.setBrandId(cadenaId);
-        priceEntity.setProductId(productoId);
-        priceEntity.setPriority((short) 1);
-        priceEntity.setStartDate(fechaInicio);
-        priceEntity.setEndDate(fechaFin);
+        var priceEntity = PriceEntity.getInstance(cadenaId, productoId, priority, fechaInicio, fechaFin);
 
-        var lista = new ArrayList<PriceEntity>();
         lista.add(priceEntity);
-
-        PriceRequestDto expectedRequest = PriceRequestDto.builder()
-                .cadenaId(cadenaId)
-                .productoId(productoId)
-                .fechaAplicacion(fechaAplicacion)
-                .build();
 
         PriceResponseDto expectedResponse = PriceResponseDto.builder()
                 .cadenaId(cadenaId)
                 .productoId(productoId)
-                .tarifa(4)
-                .fechasAplicacion(DateUtils.toISO(fechaAplicacion))
-                .precioFinal(BigDecimal.valueOf(38.95))
+                .tarifa(tarifa)
+                .fechasAplicacion(fechaAplicacionEnIso)
+                .precioFinal(precioFinal)
                 .build();
 
-        when(environmentService.getApiKey()).thenReturn(ApiKey);
+        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
 
-        when(
-                pricesRepository
-                        .findByBrandIdAndProductIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByPriorityDesc(cadenaId, productoId, fechaAplicacion, fechaAplicacion))
-                .thenReturn(lista);
-
-        when(priceManagerService.findPriceFinal(expectedRequest)).thenReturn(expectedResponse);
-
-        String expectedJsonResponse = objectMapper.writeValueAsString(expectedResponse);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/prices/{cadenaId}/{productoId}/query", cadenaId, productoId)
-                        .header("ApiKey", ApiKey)
-                        .param("dateApply", dateApply)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(expectedJsonResponse));
+        execute(dateApply, fechaAplicacion, lista, resultado);
     }
 }

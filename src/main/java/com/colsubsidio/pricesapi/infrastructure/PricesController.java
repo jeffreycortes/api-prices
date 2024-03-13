@@ -4,13 +4,14 @@ import com.colsubsidio.pricesapi.application.PriceManagerService;
 import com.colsubsidio.pricesapi.common.DateUtils;
 import com.colsubsidio.pricesapi.common.EnvironmentService;
 import com.colsubsidio.pricesapi.common.telemetry.LogsManager;
+import com.colsubsidio.pricesapi.domain.ErrorApi;
+import com.colsubsidio.pricesapi.domain.Mensajes;
 import com.colsubsidio.pricesapi.domain.PriceRequestDto;
-import com.colsubsidio.pricesapi.domain.PriceResponseDto;
-import org.springframework.format.annotation.DateTimeFormat;
+import com.colsubsidio.pricesapi.domain.Resultado;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 
 @RestController
@@ -26,6 +27,7 @@ public class PricesController  {
         this.logsManager = logsManager;
         this.priceManagerService = priceManagerService;
     }
+
     @GetMapping("/version")
     public String version() {
         logsManager.info("Version: ", environmentService.getVersion());
@@ -34,35 +36,37 @@ public class PricesController  {
 
     @GetMapping(value = "/{cadenaId}/{productoId}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public PriceResponseDto getPriceFinal(
-            @PathVariable("cadenaId") long cadenaId,
-            @PathVariable("productoId") long productoId,
-            @RequestParam Date dateApply) {
-        logsManager.info("Fecha aplicacion", dateApply);
-        return PriceResponseDto.builder()
-                .cadenaId(cadenaId)
-                .productoId(productoId)
-                .tarifa(1)
-                .fechasAplicacion(DateUtils.toISO(dateApply))
-                .precioFinal(BigDecimal.valueOf(35.500))
-                .moneda("COP")
-                .build();
-    }
-    @GetMapping(value = "/{cadenaId}/{productoId}/query", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public PriceResponseDto getPriceEntity(
+    public Resultado getPriceFinal(
             @PathVariable("cadenaId") long cadenaId,
             @PathVariable("productoId") long productoId,
             @RequestParam String dateApply) {
-        logsManager.info("Fecha aplicacion", dateApply.toString());
+        Date fechaAplicacion;
+        try {
+            fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
+        }
+        catch (Exception ex) {
+            var detalles = new ArrayList<String>();
+            detalles.add(ex.getMessage());
 
-        Date fechaAplicacion = DateUtils.formatDate(dateApply, "yyyy-MM-dd HH:mm:ss");
+            var error = ErrorApi
+                    .builder()
+                    .codigo(Mensajes.EX001.getCodigo())
+                    .descripcion(Mensajes.EX001.getDescripcion())
+                    .detalles(detalles)
+                    .build();
+
+            var resultado = Resultado.instance(HttpStatus.INTERNAL_SERVER_ERROR, false, null);
+            resultado.setErrorApi(error);
+
+            return resultado;
+        }
+
         var filter =  PriceRequestDto.builder()
                 .cadenaId(cadenaId)
                 .productoId(productoId)
                 .fechaAplicacion(fechaAplicacion)
                 .build();
 
-        return this.priceManagerService.findPriceFinal(filter);
+        return this.priceManagerService.getPriceFinal(filter);
     }
 }

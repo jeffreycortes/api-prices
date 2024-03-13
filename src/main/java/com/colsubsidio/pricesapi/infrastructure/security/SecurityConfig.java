@@ -25,19 +25,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private ApiKeyAuthFilter apiKeyAuthFilter;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         this.log.info("Se aplica configuracion de seguridad");
         http
+                .authorizeRequests().antMatchers("/v1.0/h2-console/**").permitAll()
+                .anyRequest().permitAll()
+                .and()
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .headers().frameOptions().sameOrigin()
                 .and()
-                .authorizeRequests()
-                    .anyRequest().permitAll()
-                .and()
-                .addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

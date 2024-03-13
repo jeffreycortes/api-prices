@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class Error {
+public class ErrorApi {
     private String codigo;
     private String descripcion;
     @Builder.Default
