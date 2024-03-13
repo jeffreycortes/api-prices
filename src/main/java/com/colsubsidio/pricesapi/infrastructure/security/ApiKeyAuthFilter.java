@@ -34,10 +34,6 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         this.environmentService = environmentService;
     }
 
-    private Authentication createAuthentication() {
-        return new ApiKeyAuthenticationToken("apikey", Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_USER")));
-    }
-
     @Override
     public void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -53,7 +49,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
         if (sonCredencialesValidas || esH2Console) {
             this.log.info("sonCredencialesValidas", "Se crea autenticación");
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("trigger", (Object)null, (Collection)null);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("trigger",null, null);
             SecurityContextHolder.getContext().setAuthentication(auth);
             chain.doFilter(request, response);
         } else {

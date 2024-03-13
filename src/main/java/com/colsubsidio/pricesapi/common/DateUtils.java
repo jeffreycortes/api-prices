@@ -1,9 +1,8 @@
 package com.colsubsidio.pricesapi.common;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class DateUtils {
 	public static Date getDate() {
@@ -11,32 +10,12 @@ public class DateUtils {
 	}
 
 	public static String getDateString(String formatReturn) {
-		try {
-			var sdf = new SimpleDateFormat(formatReturn);
-			return sdf.format(getDate());
-		} catch (Exception e) {
-			var error = new StringBuilder();
-			error.append(DateUtils.class.getName());
-			error.append(";");
-			error.append("formatDate");
-			error.append(";");
-			error.append(e.getMessage());
-			return "";
-		}
+		var sdf = new SimpleDateFormat(formatReturn);
+		return sdf.format(getDate());
 	}
 
-	public static Date formatDate(String dateTxt, String format) {
-		try {
-			return new SimpleDateFormat(format).parse(dateTxt);
-		} catch (Exception e) {
-			var error = new StringBuilder();
-			error.append(DateUtils.class.getName());
-			error.append(";");
-			error.append("formatDate");
-			error.append(";");
-			error.append(e.getMessage());
-			return null;
-		}
+	public static Date formatDate(String dateTxt, String format) throws ParseException {
+		return new SimpleDateFormat(format).parse(dateTxt);
 	}
 
 	public static String toISO(Date date) {
