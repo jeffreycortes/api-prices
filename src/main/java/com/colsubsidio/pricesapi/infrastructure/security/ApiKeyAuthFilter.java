@@ -53,7 +53,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
             chain.doFilter(request, response);
         } else {
-            var resultado = Resultado.instance(HttpStatus.UNAUTHORIZED, false, null);
+            var resultado = Resultado.instance(HttpStatus.UNAUTHORIZED.value(), false, null);
             String jsonResponse = GsonUtils.serialize(resultado);
             this.log.info("noSonCredencialesValidas", "Se niega petición");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

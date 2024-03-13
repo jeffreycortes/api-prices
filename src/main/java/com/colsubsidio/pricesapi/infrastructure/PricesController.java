@@ -55,7 +55,7 @@ public class PricesController  {
                     .detalles(detalles)
                     .build();
 
-            var resultado = Resultado.instance(HttpStatus.INTERNAL_SERVER_ERROR, false, null);
+            var resultado = Resultado.instance(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, null);
             resultado.setErrorApi(error);
 
             return resultado;

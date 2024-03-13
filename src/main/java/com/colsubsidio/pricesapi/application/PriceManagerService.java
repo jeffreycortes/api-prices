@@ -24,7 +24,7 @@ public class PriceManagerService {
                                 priceRequest.getFechaAplicacion(),
                                 priceRequest.getFechaAplicacion());
         if (precios.isEmpty())
-            return Resultado.instance(HttpStatus.NOT_FOUND, false, null);
+            return Resultado.instance(HttpStatus.NOT_FOUND.value(), false, null);
 
         var price = precios.get(0);
         var priceFinal = PriceResponseDto
@@ -37,6 +37,6 @@ public class PriceManagerService {
                             .moneda(price.getCurr())
                             .build();
 
-        return Resultado.instance(HttpStatus.OK, true, priceFinal);
+        return Resultado.instance(HttpStatus.OK.value(), true, priceFinal);
     }
 }

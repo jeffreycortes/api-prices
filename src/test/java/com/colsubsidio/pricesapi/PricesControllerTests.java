@@ -101,7 +101,7 @@ public class PricesControllerTests {
                 .precioFinal(precioFinal)
                 .build();
 
-        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
+        var resultado =  Resultado.instance(HttpStatus.OK.value(),true,  expectedResponse);
 
         execute(dateApply, fechaAplicacion, lista, resultado);
     }
@@ -130,7 +130,7 @@ public class PricesControllerTests {
                 .precioFinal(precioFinal)
                 .build();
 
-        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
+        var resultado =  Resultado.instance(HttpStatus.OK.value(),true,  expectedResponse);
 
         execute(dateApply, fechaAplicacion, lista, resultado);
     }
@@ -159,7 +159,7 @@ public class PricesControllerTests {
                 .precioFinal(precioFinal)
                 .build();
 
-        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
+        var resultado =  Resultado.instance(HttpStatus.OK.value(),true,  expectedResponse);
 
         execute(dateApply, fechaAplicacion, lista, resultado);
     }
@@ -188,7 +188,7 @@ public class PricesControllerTests {
                 .precioFinal(precioFinal)
                 .build();
 
-        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
+        var resultado =  Resultado.instance(HttpStatus.OK.value(),true,  expectedResponse);
 
         execute(dateApply, fechaAplicacion, lista, resultado);
     }
@@ -216,7 +216,7 @@ public class PricesControllerTests {
                 .precioFinal(precioFinal)
                 .build();
 
-        var resultado =  Resultado.instance(HttpStatus.OK,true,  expectedResponse);
+        var resultado =  Resultado.instance(HttpStatus.OK.value(),true,  expectedResponse);
 
         execute(dateApply, fechaAplicacion, lista, resultado);
     }
