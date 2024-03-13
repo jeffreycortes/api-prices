@@ -20,7 +20,7 @@ Este proyecto implementa buenas prácticas de desarrollo tales cómo principos s
 - versión (GET): http://localhost:8080/v1.0/version
 - consulta de precios (GET): http://localhost:8080/v1.0/prices/{categoriaId}/{productoId}?dateApply={fecha_aplicacion}
   - Ejemplo: ``http://localhost:8080/v1.0/prices/1/35455?dateApply=2020-06-14 16:00:00``
-  - Respuesta: ``{
+  - Respuesta OK: ``{
     "statusCode": 200,
     "success": true,
     "errorApi": null,
@@ -32,6 +32,18 @@ Este proyecto implementa buenas prácticas de desarrollo tales cómo principos s
     "precioFinal": 25.45,
     "moneda": "EUR"
     }
+    }``
+  - Respuesta con error: ``{
+    "statusCode": 500,
+    "success": false,
+    "errorApi": {
+    "codigo": "EX001",
+    "descripcion": "Fecha errada o con formato incorrecto",
+    "detalles": [
+    "Unparseable date: \"2020-06-14T16:00:00\""
+    ]
+    },
+    "data": null
     }``
 # Build and Test
 TODO: Describe and show how to build your code and run the tests. 
